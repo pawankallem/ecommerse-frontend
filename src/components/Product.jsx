@@ -46,7 +46,7 @@ const Product = () => {
 
     useEffect(() => {
         getProduct();
-    }, []);
+    }, [id]);
 
     if (loading) {
         return (
