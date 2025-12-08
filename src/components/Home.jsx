@@ -9,45 +9,94 @@ const Home = () => {
     const getAllProducts = async () => {
         try {
             const res = await axios.get(import.meta.env.VITE_API_URL + "/products");
-            setProducts(res.data);
+
+            const updatedProducts = await Promise.all(
+                res.data.map(async (product) => {
+                    try {
+                        const imageRes = await axios.get(
+                            import.meta.env.VITE_API_URL + `/product/${product.id}/image`,
+                            { responseType: 'blob' }
+                        );
+                        const imageUrl = URL.createObjectURL(imageRes.data);
+                        return { ...product, imageUrl };
+                    } catch (error) {
+                        console.log("error : ", error);
+                        return { ...product, imageUrl: "" };
+                    }
+                })
+            );
+
+            setProducts(updatedProducts);
         } catch (error) {
             console.log("error : ", error);
         }
     };
 
-    const handleOpenProduct = (id) => navigate(`/product/${id}`)
+    const handleOpenProduct = (id) => navigate(`/product/${id}`);
 
     useEffect(() => {
         getAllProducts();
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-100 py-10">
-            <div className="max-w-6xl mx-auto px-4">
-                <h1 className="text-3xl font-bold mb-8 text-gray-800">
-                    Products
+        <div className="min-h-screen bg-gray-100 py-12">
+            <div className="max-w-7xl mx-auto px-4">
+                <h1 className="text-4xl font-bold mb-10 text-gray-800">
+                    Explore Products
                 </h1>
 
-                <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    {products.map((e) => (
+                <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                    {products.map((product) => (
                         <li
-                            key={e.id}
-                            className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
-                            onClick={() => handleOpenProduct(e.id)}
+                            key={product.id}
+                            className="bg-white rounded-xl shadow hover:shadow-xl transition cursor-pointer overflow-hidden border"
+                            onClick={() => handleOpenProduct(product.id)}
                         >
-                            <div className="p-5 flex flex-col h-full justify-between">
+                            {/* Product Image */}
+                            <div className="w-full h-52 bg-gray-200 flex items-center justify-center overflow-hidden">
+                                {product.imageUrl ? (
+                                    <img
+                                        src={product.imageUrl}
+                                        alt={product.name}
+                                        className="object-cover w-full h-full"
+                                    />
+                                ) : (
+                                    <span className="text-gray-500">No Image</span>
+                                )}
+                            </div>
+
+                            {/* Product Body */}
+                            <div className="p-5 flex flex-col justify-between h-[200px]">
+
+                                {/* Title */}
                                 <div>
-                                    <h2 className="text-xl font-semibold text-gray-800">
-                                        {e.name}
+                                    <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
+                                        {product.name}
                                     </h2>
-                                    <p className="text-gray-600 mt-2 text-sm">
-                                        {e.description}
+
+                                    {/* Category + Brand */}
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {product.category} • {product.brand}
+                                    </p>
+
+                                    {/* Description */}
+                                    <p className="text-gray-600 text-sm mt-2 line-clamp-2">
+                                        {product.description}
                                     </p>
                                 </div>
 
-                                <div className="mt-4">
-                                    <span className="text-lg font-bold text-indigo-600">
-                                        ${e.price}
+                                {/* Price + Stock */}
+                                <div className="mt-4 flex items-center justify-between">
+                                    <span className="text-xl font-bold text-indigo-600">
+                                        ${product.price}
+                                    </span>
+
+                                    <span
+                                        className={`text-xs px-2 py-1 rounded-full font-semibold 
+                                            ${product.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}
+                                        `}
+                                    >
+                                        {product.available ? "In Stock" : "Out of Stock"}
                                     </span>
                                 </div>
                             </div>
