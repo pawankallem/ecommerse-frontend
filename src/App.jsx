@@ -3,6 +3,7 @@ import './App.css'
 import Body from './components/Body'
 import Home from './components/Home'
 import Product from './components/Product'
+import AddProduct from './components/AddProduct'
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
         <Route path='/' element={<Body />} >
           <Route path="" element={<Home />} />
           <Route path="product/:id" element={<Product />} />
+          <Route path="add-product" element={<AddProduct />} />
         </Route>
         <Route path='*' element={<Body />} />
       </Routes>
