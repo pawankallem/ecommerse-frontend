@@ -4,6 +4,7 @@ import Body from './components/Body'
 import Home from './components/Home'
 import Product from './components/Product'
 import AddProduct from './components/AddProduct'
+import UpdateProduct from './components/UpdateProduct'
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
           <Route path="" element={<Home />} />
           <Route path="product/:id" element={<Product />} />
           <Route path="add-product" element={<AddProduct />} />
+          <Route path="update-product/:id" element={<UpdateProduct />} />
         </Route>
         <Route path='*' element={<Body />} />
       </Routes>

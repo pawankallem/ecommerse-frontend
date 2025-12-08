@@ -1,8 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const Product = () => {
+    const navigate = useNavigate()
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -26,6 +27,22 @@ const Product = () => {
             setLoading(false);
         }
     };
+
+
+    const gotoUpdatePage = () => navigate(`/update-product/${id}`, { state: { product } })
+
+    const handleDelete = async () => {
+        if (!confirm("Are you sure you want to delete this product?")) return;
+
+        try {
+            await axios.delete(import.meta.env.VITE_API_URL + `/product/${product.id}`);
+
+            alert("Product deleted!");
+            navigate("/")
+        } catch (error) {
+            alert("Delete failed.");
+        }
+    }
 
     useEffect(() => {
         getProduct();
@@ -119,6 +136,24 @@ const Product = () => {
                                 {product.available ? "Add to Cart" : "Unavailable"}
                             </button>
                         </div>
+
+                        <div className="mt-6 flex gap-4">
+                            <button
+                                onClick={gotoUpdatePage}
+                                className="px-6 py-3 rounded-lg font-semibold text-white bg-yellow-600 hover:bg-yellow-700"
+                            >
+                                Update
+                            </button>
+
+                            <button
+                                onClick={handleDelete}
+                                className="px-6 py-3 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700"
+                            >
+                                Delete
+                            </button>
+                        </div>
+
+
                     </div>
                 </div>
 
